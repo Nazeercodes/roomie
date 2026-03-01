@@ -242,7 +242,7 @@
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: var(--purple);
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
     color: #fff;
     font-size: 1.5rem;
     font-weight: 700;

@@ -36,7 +36,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--purple), #4f46e5);
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
     color: #fff;
     font-size: 2rem;
     font-weight: 700;

@@ -7,13 +7,19 @@
 }
 
 :root {
-  --purple: #7c3aed;
-  --purple-dark: #6d28d9;
-  --purple-light: #ede9fe;
-  --text: #111827;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --bg: #fafafa;
+  /* 🍊 Cozy Amber theme */
+  --purple: #f59e0b;
+  --purple-dark: #d97706;
+  --purple-light: #fef3c7;
+  --text: #1c1410;
+  --muted: #92806b;
+  --border: #e8ddd0;
+  --bg: #fffbf5;
+
+  /* Extra cozy tokens */
+  --accent: #fb923c;
+  --card-bg: #ffffff;
+  --warm-shadow: 0 8px 32px rgba(245, 158, 11, 0.10);
 }
 
 html {
@@ -167,12 +173,12 @@ body {
 
 .hero-card {
   position: absolute;
-  background: #fff;
+  background: #fffdf9;
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 20px;
   width: 260px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--warm-shadow);
 }
 
 .hero-card h4 {
@@ -238,7 +244,7 @@ body {
 
 /* How it works */
 .how-it-works {
-  background: #fff;
+  background: #fff9f0;
   padding: 80px 24px;
   text-align: center;
 }
@@ -283,7 +289,7 @@ body {
 .cta {
   padding: 80px 24px;
   text-align: center;
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  background: linear-gradient(135deg, #f59e0b, #fb923c);
   color: #fff;
 }
 
@@ -301,11 +307,11 @@ body {
 
 .cta .btn-primary {
   background: #fff;
-  color: var(--purple);
+  color: var(--purple-dark);
 }
 
 .cta .btn-primary:hover {
-  background: #f5f3ff;
+  background: #fef3c7;
 }
 
 /* Responsive */
