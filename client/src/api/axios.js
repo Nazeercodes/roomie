@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+// In local dev, Vite proxies /api → localhost:5000 (see vite.config.js)
+// In production (Vercel), VITE_API_URL points to the Railway backend
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: import.meta.env.VITE_API_URL || '/api',
 });
 
 // Attach JWT to every request automatically
