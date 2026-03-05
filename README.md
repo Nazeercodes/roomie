@@ -1,75 +1,56 @@
-# 🏠 RoomiE — Roommate Finder Platform
+# RoomiE
 
-A production-grade, full-stack web application for finding roommates and shared accommodation in India.
+Find a roommate. Split the rent. Live better.
 
-**Stack:** React + Vite · Node.js + Express · MongoDB · Socket.io · Cloudinary
+RoomiE is a roommate-finder web app built for people looking to share accommodation and cut down on rent. Users can post listings, browse by city, chat in real time, and save listings they like.
+
+---
+
+## Tech Stack
+
+- **Frontend** — React + Vite
+- **Backend** — Node.js, Express
+- **Database** — MongoDB (Mongoose)
+- **Auth** — JWT (access tokens, protected routes)
+- **Real-time** — Socket.io
+- **Image uploads** — Cloudinary
 
 ---
 
 ## Features
 
-- **Auth** — JWT-based register/login with protected routes
-- **Listings** — Create, browse, filter, and delete listings with Cloudinary image upload
-- **Real-time Chat** — Socket.io powered messaging between users
-- **Saved Listings** — Save/unsave listings and view your shortlist
-- **Profile** — Edit bio, age, gender, lifestyle preferences
-- **Responsive** — Mobile-first design with hamburger nav
+- Register / login with JWT auth
+- Post and browse listings with filters (city, rent, gender preference)
+- Upload listing images via Cloudinary
+- Real-time chat between users (Socket.io)
+- Save listings to a personal shortlist
+- Edit your profile (bio, age, gender, lifestyle)
+- Fully responsive — works on mobile
 
 ---
 
-## Local Development
-
-### 1. Install dependencies
+## Getting Started
 
 ```bash
-# From root
+# Install dependencies
 npm run install:all
-# or manually:
-cd server && npm install
-cd ../client && npm install
-```
 
-### 2. Configure environment variables
+# Set up environment variables
+cp server/.env.example server/.env    # fill in MONGO_URI, JWT_SECRET, CLOUDINARY_*
+# client/.env is already set for local dev
 
-```bash
-# Server
-cp server/.env.example server/.env
-# Fill in MONGO_URI, JWT_SECRET, CLOUDINARY_* values
-
-# Client
-cp client/.env.example client/.env
-# Already configured for local dev
-```
-
-### 3. Run both servers
-
-```bash
-# From root (requires concurrently)
-npm install
+# Run both servers
 npm run dev
-
-# Or run separately:
-cd server && npm run dev   # → http://localhost:5000
-cd client && npm run dev   # → http://localhost:5173
+# frontend → http://localhost:5173
+# backend  → http://localhost:5000
 ```
 
 ---
 
 ## Deployment
 
-### Backend → Railway
-
-1. Push `server/` to a GitHub repo
-2. Create a new Railway project → connect repo
-3. Add all env vars from `server/.env.example`
-4. Set `CLIENT_URL` to your Vercel frontend URL
-
-### Frontend → Vercel
-
-1. Push `client/` to GitHub
-2. Import to Vercel — it auto-detects Vite
-3. Set `VITE_API_URL` and `VITE_SOCKET_URL` to your Railway backend URL
-4. `vercel.json` handles SPA routing automatically
+- **Backend** → [Railway](https://railway.app) — connects to GitHub, add env vars, done
+- **Frontend** → [Vercel](https://vercel.com) — auto-detects Vite, set `VITE_API_URL` to Railway URL
 
 ---
 
@@ -77,16 +58,15 @@ cd client && npm run dev   # → http://localhost:5173
 
 ```
 roomie/
-├── client/          # React + Vite frontend
+├── client/          # React + Vite
 │   ├── src/
-│   │   ├── api/         # Axios instance with interceptors
+│   │   ├── api/         # Axios instance
 │   │   ├── components/  # Navbar, ListingCard
 │   │   ├── context/     # AuthContext
-│   │   └── pages/       # All page components
+│   │   └── pages/       # Home, Browse, Chat, Profile, ...
 │   └── vercel.json
-└── server/          # Node.js + Express backend
+└── server/          # Express API
     ├── models/      # User, Listing, Message
     ├── routes/      # auth, listings, users, messages, upload
-    ├── middleware/  # JWT auth middleware
-    └── Procfile
+    └── middleware/  # JWT auth
 ```
