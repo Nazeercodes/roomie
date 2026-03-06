@@ -1,0 +1,11 @@
+{
+    "build": {
+        "builder": "NIXPACKS",
+        "installCommand": "npm install --prefix server"
+    },
+    "deploy": {
+        "startCommand": "npm start --prefix server",
+        "healthcheckPath": "/",
+        "restartPolicyType": "ON_FAILURE"
+    }
+}
