@@ -15,14 +15,19 @@ export default function Register() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('🔵 Register form submitted', form);
         if (form.password.length < 6) return setError('Password must be at least 6 characters');
         setLoading(true); setError('');
         try {
+            console.log('🔵 Sending request to:', api.defaults.baseURL + '/auth/register');
             const res = await api.post('/auth/register', form);
+            console.log('✅ Registration success:', res.data);
             login(res.data);
             navigate('/browse');
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed. Try again.');
+            console.error('❌ Registration error:', err);
+            const msg = err.response?.data?.message || err.message || 'Registration failed. Try again.';
+            setError(msg);
         } finally {
             setLoading(false);
         }

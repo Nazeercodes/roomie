@@ -16,7 +16,7 @@ export default function SavedListings() {
 
     const handleUnsave = async (id) => {
         await api.post(`/users/save/${id}`);
-        setListings(prev => prev.filter(l => l._id !== id));
+        setListings(prev => prev.filter(l => l.id !== id));
     };
 
     return (

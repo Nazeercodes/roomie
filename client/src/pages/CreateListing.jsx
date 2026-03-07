@@ -70,7 +70,7 @@ export default function CreateListing() {
         setLoading(true); setError('');
         try {
             const res = await api.post('/listings', { ...form, rent: Number(form.rent) });
-            navigate(`/listing/${res.data._id}`);
+            navigate(`/listing/${res.data.id}`);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to create listing');
         } finally {

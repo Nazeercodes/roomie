@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { io } from 'socket.io-client';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import './Chat.css';
 
-let socket;
+let ws = null;
 
 export default function Chat() {
     const { userId } = useParams();
@@ -21,23 +20,34 @@ export default function Chat() {
     useEffect(() => {
         if (!user) return navigate('/login');
 
-        // Connect socket
-        socket = io(import.meta.env.VITE_SOCKET_URL, { query: { userId: user._id } });
-        socket.on('connect', () => setConnected(true));
-        socket.on('disconnect', () => setConnected(false));
-        socket.on('receiveMessage', (msg) => setMessages(prev => [...prev, msg]));
+        // Connect to FastAPI WebSocket
+        const wsUrl = (import.meta.env.VITE_SOCKET_URL || 'http://localhost:8000')
+            .replace('http://', 'ws://')
+            .replace('https://', 'wss://');
 
-        // Load conversation list for sidebar
-        api.get('/messages/conversations/list').then(res => setConversations(res.data)).catch(() => { });
+        ws = new WebSocket(`${wsUrl}/ws?userId=${user.id}`);
 
-        return () => socket.disconnect();
-    }, []);
+        ws.onopen = () => setConnected(true);
+        ws.onclose = () => setConnected(false);
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.message) setMessages(prev => [...prev, data.message]);
+        };
+
+        api.get('/messages/conversations/list')
+            .then(res => setConversations(res.data))
+            .catch(() => {});
+
+        return () => {
+            ws?.close();
+            ws = null;
+        };
+    }, [user]);
 
     useEffect(() => {
         if (!userId || !user) return;
-        // Load history + other user info
-        api.get(`/messages/${userId}`).then(res => setMessages(res.data)).catch(() => { });
-        api.get(`/users/${userId}`).then(res => setOtherUser(res.data.user)).catch(() => { });
+        api.get(`/messages/${userId}`).then(res => setMessages(res.data)).catch(() => {});
+        api.get(`/users/${userId}`).then(res => setOtherUser(res.data.user)).catch(() => {});
     }, [userId]);
 
     useEffect(() => {
@@ -47,27 +57,35 @@ export default function Chat() {
     const sendMessage = async (e) => {
         e.preventDefault();
         if (!text.trim()) return;
+
         const newMsg = {
-            conversationId: [user._id, userId].sort().join('_'),
-            sender: user._id,
-            receiver: userId,
+            conversation_id: [user.id, userId].sort().join('_'),
+            sender_id: user.id,
+            receiver_id: userId,
             text,
-            createdAt: new Date(),
+            created_at: new Date(),
         };
+
         setMessages(prev => [...prev, newMsg]);
         setText('');
-        socket.emit('sendMessage', { receiverId: userId, message: newMsg });
-        await api.post('/messages', { receiverId: userId, text }).catch(() => { });
+
+        // Send via WebSocket for real-time delivery
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ receiverId: userId, message: newMsg }));
+        }
+
+        // Persist to DB via REST
+        await api.post('/messages', { receiver_id: userId, text }).catch(() => {});
     };
 
     const getOtherPerson = (msg) => {
         if (!msg || !user) return null;
-        return msg.sender?._id === user._id ? msg.receiver : msg.sender;
+        return msg.sender_id === user.id ? msg.receiver_id : msg.sender_id;
     };
 
     return (
         <div className="chat-page">
-            {/* Sidebar: conversation list */}
+            {/* Sidebar */}
             <div className="chat-sidebar">
                 <div className="chat-sidebar-header">
                     <h3>Messages</h3>
@@ -77,17 +95,16 @@ export default function Chat() {
                         <p className="chat-empty">No conversations yet</p>
                     )}
                     {conversations.map((conv) => {
-                        const other = getOtherPerson(conv);
-                        if (!other) return null;
+                        const otherId = conv.sender_id === user.id ? conv.receiver_id : conv.sender_id;
                         return (
                             <Link
-                                key={conv._id}
-                                to={`/chat/${other._id}`}
-                                className={`chat-list-item ${userId === other._id ? 'active' : ''}`}
+                                key={conv.id}
+                                to={`/chat/${otherId}`}
+                                className={`chat-list-item ${userId === otherId ? 'active' : ''}`}
                             >
-                                <div className="chat-item-avatar">{other.name?.[0]?.toUpperCase()}</div>
+                                <div className="chat-item-avatar">{otherId?.[0]?.toUpperCase()}</div>
                                 <div className="chat-item-info">
-                                    <span className="chat-item-name">{other.name}</span>
+                                    <span className="chat-item-name">{otherId}</span>
                                     <span className="chat-item-preview">{conv.text?.slice(0, 30)}...</span>
                                 </div>
                             </Link>
@@ -96,7 +113,7 @@ export default function Chat() {
                 </div>
             </div>
 
-            {/* Main chat panel */}
+            {/* Main chat */}
             <div className="chat-container">
                 {userId ? (
                     <>
@@ -115,10 +132,10 @@ export default function Chat() {
                                 <div className="chat-no-messages">Send a message to start the conversation!</div>
                             )}
                             {messages.map((msg, i) => (
-                                <div key={i} className={`message ${msg.sender === user._id || msg.sender?._id === user._id ? 'mine' : 'theirs'}`}>
+                                <div key={i} className={`message ${msg.sender_id === user.id ? 'mine' : 'theirs'}`}>
                                     <div className="message-bubble">{msg.text}</div>
                                     <span className="message-time">
-                                        {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>
                             ))}

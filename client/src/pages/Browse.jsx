@@ -96,7 +96,7 @@ export default function Browse() {
                             <button className="btn-reset" onClick={handleReset} style={{ marginTop: 12 }}>Clear Filters</button>
                         </div>
                     ) : (
-                        listings.map(listing => <ListingCard key={listing._id} listing={listing} />)
+                        listings.map(listing => <ListingCard key={listing.id} listing={listing} />)
                     )}
                 </main>
             </div>

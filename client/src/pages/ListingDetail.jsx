@@ -21,7 +21,7 @@ export default function ListingDetail() {
                 // Check if already saved
                 if (user) {
                     api.get('/users/saved/listings').then(savedRes => {
-                        setSaved(savedRes.data.some(l => l._id === res.data._id));
+                        setSaved(savedRes.data.some(l => l.id === res.data.id));
                     }).catch(() => { });
                 }
             })
@@ -37,7 +37,7 @@ export default function ListingDetail() {
 
     const handleContact = () => {
         if (!user) return navigate('/login');
-        navigate(`/chat/${listing.postedBy._id}`);
+        navigate(`/chat/${listing.posted_by?.id}`);
     };
 
     const handleDelete = async () => {
@@ -50,10 +50,10 @@ export default function ListingDetail() {
     if (loading) return <div className="detail-loading"><div className="spinner" />Loading listing...</div>;
     if (!listing) return null;
 
-    const { title, description, rent, city, locality, bhkType, genderPreference,
-        availableFrom, images, amenities, postedBy } = listing;
+    const { title, description, rent, city, locality, bhk_type, gender_preference,
+        available_from, images, amenities, posted_by } = listing;
 
-    const isOwner = user?._id === postedBy?._id;
+    const isOwner = user?.id === posted_by?.id;
 
     return (
         <div className="detail-page">
@@ -64,10 +64,9 @@ export default function ListingDetail() {
                         {images?.length > 0
                             ? <img src={images[activeImage]} alt={title} />
                             : <div className="detail-placeholder">🏠</div>}
-                        <span className="detail-badge">{bhkType}</span>
+                        <span className="detail-badge">{bhk_type}</span>
                         {isOwner && (
                             <div className="owner-actions">
-                                <Link to={`/edit/${id}`} className="edit-btn">✏️ Edit</Link>
                                 <button onClick={handleDelete} className="delete-btn" disabled={deleting}>
                                     {deleting ? 'Deleting...' : '🗑️ Delete'}
                                 </button>
@@ -102,8 +101,8 @@ export default function ListingDetail() {
                         </div>
 
                         <div className="detail-chips">
-                            <span className="chip">👥 {genderPreference} Only</span>
-                            <span className="chip">📅 From {new Date(availableFrom).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                            <span className="chip">👥 {gender_preference} Only</span>
+                            <span className="chip">📅 From {new Date(available_from).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                         </div>
 
                         <div className="detail-section">
@@ -124,10 +123,10 @@ export default function ListingDetail() {
                     {/* Sidebar */}
                     <aside className="detail-sidebar">
                         <div className="poster-card">
-                            <div className="poster-avatar-lg">{postedBy?.name?.[0]?.toUpperCase()}</div>
-                            <h4>{postedBy?.name}</h4>
-                            {postedBy?.city && <p>📍 {postedBy.city}</p>}
-                            <Link to={`/profile/${postedBy?._id}`} className="view-profile-btn">View Profile</Link>
+                            <div className="poster-avatar-lg">{posted_by?.name?.[0]?.toUpperCase()}</div>
+                            <h4>{posted_by?.name}</h4>
+                            {posted_by?.city && <p>📍 {posted_by.city}</p>}
+                            <Link to={`/profile/${posted_by?.id}`} className="view-profile-btn">View Profile</Link>
                         </div>
 
                         {!isOwner && (

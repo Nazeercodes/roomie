@@ -37,7 +37,7 @@ export default function Navbar() {
                         <>
                             <Link to="/create" className={`btn-post ${isActive('/create')}`} onClick={close}>+ Post Room</Link>
                             <Link to="/saved" className={isActive('/saved')} onClick={close}>Saved</Link>
-                            <Link to={`/profile/${user._id}`} className={`nav-avatar-link ${isActive(`/profile/${user._id}`)}`} onClick={close}>
+                            <Link to={`/profile/${user.id}`} className={`nav-avatar-link ${isActive(`/profile/${user.id}`)}`} onClick={close}>
                                 <div className="nav-avatar">{user.name?.[0]?.toUpperCase()}</div>
                                 <span>{user.name?.split(' ')[0]}</span>
                             </Link>

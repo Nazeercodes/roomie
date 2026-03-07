@@ -18,7 +18,7 @@ export default function Profile() {
     const [editOpen, setEditOpen] = useState(false);
     const [editForm, setEditForm] = useState({});
     const [saving, setSaving] = useState(false);
-    const isOwn = user?._id === id;
+    const isOwn = user?.id === id;
 
     useEffect(() => {
         api.get(`/users/${id}`)
@@ -69,7 +69,7 @@ export default function Profile() {
     const handleDeleteListing = async (listingId) => {
         if (!window.confirm('Delete this listing?')) return;
         await api.delete(`/listings/${listingId}`);
-        setListings(l => l.filter(x => x._id !== listingId));
+        setListings(l => l.filter(x => x.id !== listingId));
     };
 
     if (loading) return <div className="profile-loading"><div className="spinner" />Loading profile...</div>;
@@ -112,10 +112,10 @@ export default function Profile() {
                         <h2>{isOwn ? 'Your Listings' : `${profile.name}'s Listings`}</h2>
                         <div className="profile-listings-grid">
                             {listings.map(l => (
-                                <div key={l._id} className="profile-listing-wrap">
+                                <div key={l.id} className="profile-listing-wrap">
                                     <ListingCard listing={l} />
                                     {isOwn && (
-                                        <button className="delete-listing-btn" onClick={() => handleDeleteListing(l._id)}>
+                                        <button className="delete-listing-btn" onClick={() => handleDeleteListing(l.id)}>
                                             🗑️ Delete
                                         </button>
                                     )}

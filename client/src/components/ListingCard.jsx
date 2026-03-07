@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import './ListingCard.css';
 
 export default function ListingCard({ listing }) {
-    const { _id, title, rent, city, locality, bhkType, genderPreference, images, postedBy } = listing;
+    const { id, title, rent, city, locality, bhk_type, gender_preference, images, posted_by } = listing;
 
     return (
         <article className="listing-card">
@@ -25,10 +25,10 @@ export default function ListingCard({ listing }) {
                 </div>
                 <div className="card-footer">
                     <div className="card-poster">
-                        <div className="poster-avatar">{postedBy?.name?.[0]}</div>
-                        <span>{postedBy?.name}</span>
+                        <div className="poster-avatar">{posted_by?.name?.[0]}</div>
+                        <span>{posted_by?.name}</span>
                     </div>
-                    <Link to={`/listing/${_id}`} className="card-btn">View Details</Link>
+                    <Link to={`/listing/${id}`} className="card-btn">View Details</Link>
                 </div>
             </div>
         </article>
