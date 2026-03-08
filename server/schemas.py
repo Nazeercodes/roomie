@@ -116,6 +116,7 @@ class MessageOut(BaseModel):
     sender_id: str
     receiver_id: str
     text: str
+    is_read: bool = False
     created_at: Optional[datetime] = None
 
     class Config:

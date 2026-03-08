@@ -32,12 +32,10 @@ export default function Profile() {
                     age: res.data.user.age || '',
                     gender: res.data.user.gender || '',
                     phone: res.data.user.phone || '',
-                    preferences: {
-                        lifestyle: res.data.user.preferences?.lifestyle || '',
-                        sleepTime: res.data.user.preferences?.sleepTime || '',
-                        smoking: res.data.user.preferences?.smoking || false,
-                        pets: res.data.user.preferences?.pets || false,
-                    }
+                    lifestyle: res.data.user.lifestyle || '',
+                    sleep_time: res.data.user.sleep_time || '',
+                    smoking: res.data.user.smoking || false,
+                    pets: res.data.user.pets || false,
                 });
             })
             .finally(() => setLoading(false));
@@ -47,7 +45,7 @@ export default function Profile() {
         const { name, value, type, checked } = e.target;
         if (name.startsWith('pref_')) {
             const key = name.replace('pref_', '');
-            setEditForm(f => ({ ...f, preferences: { ...f.preferences, [key]: type === 'checkbox' ? checked : value } }));
+            setEditForm(f => ({ ...f, [key]: type === 'checkbox' ? checked : value }));
         } else {
             setEditForm(f => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
         }
@@ -89,10 +87,10 @@ export default function Profile() {
                             {profile.gender && <span className="chip">{profile.gender}</span>}
                             {profile.age && <span className="chip">{profile.age} yrs</span>}
                             {profile.phone && <span className="chip">📞 {profile.phone}</span>}
-                            {profile.preferences?.lifestyle && <span className="chip">☀️ {profile.preferences.lifestyle}</span>}
-                            {profile.preferences?.sleepTime && <span className="chip">🌙 {profile.preferences.sleepTime}</span>}
-                            {profile.preferences?.smoking && <span className="chip">🚬 Smoker</span>}
-                            {profile.preferences?.pets && <span className="chip">🐾 Pet-friendly</span>}
+                            {profile.lifestyle && <span className="chip">☀️ {profile.lifestyle}</span>}
+                            {profile.sleep_time && <span className="chip">🌙 {profile.sleep_time}</span>}
+                            {profile.smoking && <span className="chip">🚬 Smoker</span>}
+                            {profile.pets && <span className="chip">🐾 Pet-friendly</span>}
                         </div>
                     </div>
                     <div className="profile-actions">
@@ -170,14 +168,14 @@ export default function Profile() {
                                 </div>
                                 <div className="form-group">
                                     <label>Lifestyle</label>
-                                    <select name="pref_lifestyle" value={editForm.preferences?.lifestyle} onChange={handleEditChange}>
+                                    <select name="pref_lifestyle" value={editForm.lifestyle} onChange={handleEditChange}>
                                         <option value="">Select</option>
                                         {LIFESTYLE.map(l => <option key={l}>{l}</option>)}
                                     </select>
                                 </div>
                                 <div className="form-group">
                                     <label>Sleep Time</label>
-                                    <select name="pref_sleepTime" value={editForm.preferences?.sleepTime} onChange={handleEditChange}>
+                                    <select name="pref_sleep_time" value={editForm.sleep_time} onChange={handleEditChange}>
                                         <option value="">Select</option>
                                         {SLEEP_TIMES.map(s => <option key={s}>{s}</option>)}
                                     </select>
@@ -189,11 +187,11 @@ export default function Profile() {
                             </div>
                             <div className="checkbox-row">
                                 <label className="checkbox-label">
-                                    <input type="checkbox" name="pref_smoking" checked={editForm.preferences?.smoking} onChange={handleEditChange} />
+                                    <input type="checkbox" name="pref_smoking" checked={editForm.smoking} onChange={handleEditChange} />
                                     I smoke
                                 </label>
                                 <label className="checkbox-label">
-                                    <input type="checkbox" name="pref_pets" checked={editForm.preferences?.pets} onChange={handleEditChange} />
+                                    <input type="checkbox" name="pref_pets" checked={editForm.pets} onChange={handleEditChange} />
                                     I have / am ok with pets
                                 </label>
                             </div>

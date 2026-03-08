@@ -177,3 +177,17 @@
         padding: 10px 16px !important;
     }
 }
+.unread-badge {
+    background: #ff3b3b;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 12px;
+    margin-left: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    box-shadow: 0 2px 5px rgba(255,59,59,0.3);
+}

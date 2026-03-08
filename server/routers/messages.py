@@ -3,9 +3,20 @@ from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
 import models, schemas
-from auth import get_current_user
+from routers.auth import get_current_user
 
 router = APIRouter(prefix="/api/messages", tags=["messages"])
+
+@router.get("/unread")
+def get_unread_count(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    count = db.query(models.Message).filter(
+        models.Message.receiver_id == current_user.id,
+        models.Message.is_read == False
+    ).count()
+    return {"unread": count}
 
 @router.get("/conversations/list")
 def get_conversations(
@@ -33,11 +44,20 @@ def get_conversation(
     current_user: models.User = Depends(get_current_user)
 ):
     conversation_id = "_".join(sorted([current_user.id, user_id]))
+    
+    # Mark unread messages as read
+    db.query(models.Message).filter(
+        models.Message.conversation_id == conversation_id,
+        models.Message.receiver_id == current_user.id,
+        models.Message.is_read == False
+    ).update({"is_read": True})
+    db.commit()
+
     return db.query(models.Message).filter(
         models.Message.conversation_id == conversation_id
     ).order_by(models.Message.created_at.asc()).all()
 
-@router.post("/", response_model=schemas.MessageOut, status_code=201)
+@router.post("", response_model=schemas.MessageOut, status_code=201)
 def send_message(
     body: schemas.SendMessageRequest,
     db: Session = Depends(get_db),

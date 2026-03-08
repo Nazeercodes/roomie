@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 import cloudinary
 import cloudinary.uploader
 import os
-from auth import get_current_user
+from routers.auth import get_current_user
 import models
 
 router = APIRouter(prefix="/api/upload", tags=["upload"])

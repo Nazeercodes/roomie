@@ -15,6 +15,7 @@ export default function Chat() {
     const [otherUser, setOtherUser] = useState(null);
     const [conversations, setConversations] = useState([]);
     const [connected, setConnected] = useState(false);
+    const [onlineUsers, setOnlineUsers] = useState(new Set());
     const bottomRef = useRef(null);
 
     useEffect(() => {
@@ -29,26 +30,67 @@ export default function Chat() {
 
         ws.onopen = () => setConnected(true);
         ws.onclose = () => setConnected(false);
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.message) setMessages(prev => [...prev, data.message]);
-        };
 
-        api.get('/messages/conversations/list')
-            .then(res => setConversations(res.data))
-            .catch(() => {});
+        const fetchConvos = () => {
+            api.get('/messages/conversations/list')
+                .then(res => setConversations(res.data))
+                .catch(() => { });
+        };
+        fetchConvos();
 
         return () => {
             ws?.close();
             ws = null;
         };
-    }, [user]);
+    }, [user, navigate]);
 
     useEffect(() => {
-        if (!userId || !user) return;
-        api.get(`/messages/${userId}`).then(res => setMessages(res.data)).catch(() => {});
-        api.get(`/users/${userId}`).then(res => setOtherUser(res.data.user)).catch(() => {});
-    }, [userId]);
+        if (!user) return;
+        if (!userId) {
+            if (ws) {
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'online_users') {
+                        setOnlineUsers(new Set(data.users));
+                    } else if (data.type === 'status') {
+                        setOnlineUsers(prev => {
+                            const next = new Set(prev);
+                            if (data.online) next.add(data.userId);
+                            else next.delete(data.userId);
+                            return next;
+                        });
+                    } else if (data.message) {
+                        api.get('/messages/conversations/list').then(res => setConversations(res.data)).catch(() => { });
+                    }
+                };
+            }
+            return;
+        }
+
+        api.get(`/messages/${userId}`).then(res => setMessages(res.data)).catch(() => { });
+        api.get(`/users/${userId}`).then(res => setOtherUser(res.data.user)).catch(() => { });
+
+        if (ws) {
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'online_users') {
+                    setOnlineUsers(new Set(data.users));
+                } else if (data.type === 'status') {
+                    setOnlineUsers(prev => {
+                        const next = new Set(prev);
+                        if (data.online) next.add(data.userId);
+                        else next.delete(data.userId);
+                        return next;
+                    });
+                } else if (data.message) {
+                    if (data.message.sender_id === userId || data.message.receiver_id === userId) {
+                        setMessages(prev => [...prev, data.message]);
+                    }
+                    api.get('/messages/conversations/list').then(res => setConversations(res.data)).catch(() => { });
+                }
+            };
+        }
+    }, [userId, user]);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -75,7 +117,7 @@ export default function Chat() {
         }
 
         // Persist to DB via REST
-        await api.post('/messages', { receiver_id: userId, text }).catch(() => {});
+        await api.post('/messages', { receiver_id: userId, text }).catch(() => { });
     };
 
     const getOtherPerson = (msg) => {
@@ -96,16 +138,20 @@ export default function Chat() {
                     )}
                     {conversations.map((conv) => {
                         const otherId = conv.sender_id === user.id ? conv.receiver_id : conv.sender_id;
+                        const isUnread = !conv.is_read && conv.receiver_id === user.id;
                         return (
                             <Link
                                 key={conv.id}
                                 to={`/chat/${otherId}`}
-                                className={`chat-list-item ${userId === otherId ? 'active' : ''}`}
+                                className={`chat-list-item ${userId === otherId ? 'active' : ''} ${isUnread ? 'has-unread' : ''}`}
                             >
                                 <div className="chat-item-avatar">{otherId?.[0]?.toUpperCase()}</div>
                                 <div className="chat-item-info">
-                                    <span className="chat-item-name">{otherId}</span>
-                                    <span className="chat-item-preview">{conv.text?.slice(0, 30)}...</span>
+                                    <span className="chat-item-name">
+                                        {otherId}
+                                        {isUnread && <span className="unread-dot">⬤</span>}
+                                    </span>
+                                    <span className={`chat-item-preview ${isUnread ? 'unread-text' : ''}`}>{conv.text?.slice(0, 30)}...</span>
                                 </div>
                             </Link>
                         );
@@ -121,8 +167,8 @@ export default function Chat() {
                             <div className="chat-avatar">{otherUser?.name?.[0]?.toUpperCase()}</div>
                             <div>
                                 <h3>{otherUser?.name || 'Loading...'}</h3>
-                                <span className={`status-dot ${connected ? 'online' : 'offline'}`}>
-                                    ● {connected ? 'Online' : 'Offline'}
+                                <span className={`status-dot ${onlineUsers.has(userId) ? 'online' : 'offline'}`}>
+                                    ● {onlineUsers.has(userId) ? 'Online' : 'Offline'}
                                 </span>
                             </div>
                         </div>

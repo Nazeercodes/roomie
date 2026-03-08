@@ -69,7 +69,13 @@ export default function CreateListing() {
             return setError('Please fill all required fields');
         setLoading(true); setError('');
         try {
-            const res = await api.post('/listings', { ...form, rent: Number(form.rent) });
+            const res = await api.post('/listings', {
+                ...form,
+                rent: Number(form.rent),
+                bhk_type: form.bhkType,
+                available_from: form.availableFrom,
+                gender_preference: form.genderPreference
+            });
             navigate(`/listing/${res.data.id}`);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to create listing');

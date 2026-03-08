@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
@@ -8,6 +9,19 @@ export default function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        if (!user) return;
+        const fetchUnread = () => {
+            api.get('/messages/unread')
+                .then(res => setUnreadCount(res.data.unread))
+                .catch(() => { });
+        };
+        fetchUnread();
+        const interval = setInterval(fetchUnread, 15000);
+        return () => clearInterval(interval);
+    }, [user, location.pathname]);
 
     const handleLogout = () => {
         logout();
@@ -37,6 +51,9 @@ export default function Navbar() {
                         <>
                             <Link to="/create" className={`btn-post ${isActive('/create')}`} onClick={close}>+ Post Room</Link>
                             <Link to="/saved" className={isActive('/saved')} onClick={close}>Saved</Link>
+                            <Link to="/chat" className={isActive('/chat')} onClick={close}>
+                                Messages {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
+                            </Link>
                             <Link to={`/profile/${user.id}`} className={`nav-avatar-link ${isActive(`/profile/${user.id}`)}`} onClick={close}>
                                 <div className="nav-avatar">{user.name?.[0]?.toUpperCase()}</div>
                                 <span>{user.name?.split(' ')[0]}</span>

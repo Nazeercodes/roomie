@@ -267,3 +267,20 @@
         max-width: 80%;
     }
 }
+
+.has-unread {
+    background: #fff8f8;
+    border-left: 3px solid var(--purple);
+}
+
+.unread-dot {
+    color: #ff3b3b;
+    font-size: 0.5rem;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.unread-text {
+    font-weight: 600;
+    color: var(--text);
+}

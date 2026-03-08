@@ -9,10 +9,10 @@ RoomiE is a roommate-finder web app built for people looking to share accommodat
 ## Tech Stack
 
 - **Frontend** — React + Vite
-- **Backend** — Node.js, Express
-- **Database** — MongoDB (Mongoose)
+- **Backend** — Python + FastAPI
+- **Database** — PostgreSQL (SQLAlchemy)
 - **Auth** — JWT (access tokens, protected routes)
-- **Real-time** — Socket.io
+- **Real-time** — WebSockets (FastAPI)
 - **Image uploads** — Cloudinary
 
 ---
@@ -32,17 +32,23 @@ RoomiE is a roommate-finder web app built for people looking to share accommodat
 ## Getting Started
 
 ```bash
-# Install dependencies
-npm run install:all
+# Set up backend
+cd server
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 
 # Set up environment variables
-cp server/.env.example server/.env    # fill in MONGO_URI, JWT_SECRET, CLOUDINARY_*
-# client/.env is already set for local dev
+cp .env.example .env    # fill in DATABASE_URL, JWT_SECRET, CLOUDINARY_*
 
-# Run both servers
+# Run backend
+uvicorn main:app --reload
+
+# Set up frontend
+cd ../client
+npm install
 npm run dev
 # frontend → http://localhost:5173
-# backend  → http://localhost:5000
 ```
 
 ---
@@ -64,9 +70,9 @@ roomie/
 │   │   ├── components/  # Navbar, ListingCard
 │   │   ├── context/     # AuthContext
 │   │   └── pages/       # Home, Browse, Chat, Profile, ...
-│   └── vercel.json
-└── server/          # Express API
-    ├── models/      # User, Listing, Message
-    ├── routes/      # auth, listings, users, messages, upload
-    └── middleware/  # JWT auth
+└── server/          # FastAPI API
+    ├── models.py    # SQLAlchemy models
+    ├── routers/     # auth, listings, users, messages, upload
+    ├── database.py  # Database connection
+    └── main.py      # Entry point & WebSockets
 ```

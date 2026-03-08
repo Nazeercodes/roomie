@@ -51,9 +51,9 @@ export default function ListingDetail() {
     if (!listing) return null;
 
     const { title, description, rent, city, locality, bhk_type, gender_preference,
-        available_from, images, amenities, posted_by } = listing;
+        available_from, images, amenities, owner } = listing;
 
-    const isOwner = user?.id === posted_by?.id;
+    const isOwner = user?.id === owner?.id;
 
     return (
         <div className="detail-page">
@@ -123,10 +123,10 @@ export default function ListingDetail() {
                     {/* Sidebar */}
                     <aside className="detail-sidebar">
                         <div className="poster-card">
-                            <div className="poster-avatar-lg">{posted_by?.name?.[0]?.toUpperCase()}</div>
-                            <h4>{posted_by?.name}</h4>
-                            {posted_by?.city && <p>📍 {posted_by.city}</p>}
-                            <Link to={`/profile/${posted_by?.id}`} className="view-profile-btn">View Profile</Link>
+                            <div className="poster-avatar-lg">{owner?.name?.[0]?.toUpperCase()}</div>
+                            <h4>{owner?.name}</h4>
+                            {owner?.city && <p>📍 {owner.city}</p>}
+                            <Link to={`/profile/${owner?.id}`} className="view-profile-btn">View Profile</Link>
                         </div>
 
                         {!isOwner && (

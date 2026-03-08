@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 from typing import Optional, List
 from database import get_db
 import models, schemas
-from auth import get_current_user
+from routers.auth import get_current_user
 
 router = APIRouter(prefix="/api/listings", tags=["listings"])
 
